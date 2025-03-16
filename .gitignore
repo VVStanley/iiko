@@ -1,0 +1,8 @@
+build/*
+dist/*
+external/*
+outputs/*
+*.csv
+*.exe
+*.spec
+__pycache__
