@@ -9,13 +9,16 @@ from models import ORGS, PHONES, OrgNames, RowExternal, RowOrigin, RowOutput
 
 
 # Внешние данные, путь к папке
-EXTERNAL_PATH = "./external/*.csv"
+EXTERNAL_PATH = ".\\external\\*.csv"
+# EXTERNAL_PATH = "./external/*.csv"
 
 # Наши данные с iiko
-ORIGIN_PATH = "./origin.csv"
+ORIGIN_PATH = ".\\origin.csv"
+# ORIGIN_PATH = "./origin.csv"
 
 # Вывод найденных файлов
-OUTPUT_PATH = "./output/"
+OUTPUT_PATH = ".\\output\\"
+# OUTPUT_PATH = "./output/"
 
 
 
@@ -68,10 +71,16 @@ def next_phone(org_name) -> str:
 
 def convert() -> None:
 
-    origin_data = _origin_data()
-    magnet_nums = [d.magnet_number for d in origin_data if d.magnet_number]
+    map_active_origin_employees = {}
+    deleted_cards = []
+    for emp in _origin_data():
+        if emp.magnet_card.active:
+            map_active_origin_employees.update({emp.magnet_card.active: emp})
+        else:
+            deleted_cards.append(emp.magnet_card.deleted)
     outputs = defaultdict(list)
-    
+
+    all_external_emp_card = []
     
     for file_path in glob.glob(EXTERNAL_PATH):
 
@@ -82,7 +91,8 @@ def convert() -> None:
 
             for raw_row in reader:
                 row = RowExternal.from_row(raw_row)
-                if row.number not in magnet_nums:
+                all_external_emp_card.append(row.number)
+                if row.number not in map_active_origin_employees and row.number not in deleted_cards:
                     outputs[file_name].append(
                         RowOutput(
                             phone=next_phone(_get_org_names(file_name)),
@@ -93,7 +103,25 @@ def convert() -> None:
                             org=row.org
                         )
                     )
+
+    file_name = "НЕ_найденные_у_них.csv"
+    not_founds_external_emp = {file_name: []}
+    for origin_emp_card in map_active_origin_employees.keys():
+        if origin_emp_card not in all_external_emp_card:
+            emp = map_active_origin_employees.get(origin_emp_card)
+            not_founds_external_emp[file_name].append(
+                RowOutput(
+                    phone=emp.phone,
+                    track_1=emp.magnet_card.active,
+                    name=emp.fio,
+                    last_name=emp.fio,
+                    amount=emp.category,
+                    org=emp.org,
+                )
+            )
+
     save_data(outputs)
+    save_data(not_founds_external_emp)
 
 
 

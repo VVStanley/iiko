@@ -1,4 +1,5 @@
 from collections import namedtuple
+import re
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any, Dict, List, Optional
@@ -96,15 +97,38 @@ class RowExternal:
         )
 
 
+@dataclass
+class MCard:
+    active: Optional[str]
+    deleted: List
+
+    @classmethod
+    def from_magnet_cards(cls, magnet_cards: str) -> "MCard":
+        active = None
+        deleted = []
+        if ',' in magnet_cards:
+            for card in magnet_cards.split(","):
+                card = card.strip()
+                if card.isdigit():
+                    active = card
+                else:
+                    deleted.append(re.findall(r"\d+", card)[-1])
+        else:
+            if magnet_cards.isdigit():
+                active = magnet_cards.strip()
+            else:
+                deleted = re.findall(r"\d+", magnet_cards)[-1]
+        return cls(active=active, deleted=deleted)
+
 
 @dataclass
 class RowOrigin:
     phone: str
     fio: str
-    magnet_number: str
-    magnet_cards: list[str]
+    magnet_card: MCard
+    magnet_cards: str
     when_created: str
-    guest_categories: list[str]
+    guest_categories: str
     org: str
     category: str
 
@@ -133,7 +157,7 @@ class RowOrigin:
         return cls(
             phone=row["PhoneNumber"],
             fio=row["Name"],
-            magnet_number=cls._get_magnet_number(row["MagnetCards"]),
+            magnet_card=MCard.from_magnet_cards(row["MagnetCards"]),
             magnet_cards=row["MagnetCards"],
             when_created=datetime.strptime(row["WhenCreated"], "%d.%m.%Y %H:%M:%S"),
             guest_categories=row["GuestCategories"],
