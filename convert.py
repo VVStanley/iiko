@@ -10,15 +10,15 @@ from models import ORGS, PHONES, OrgNames, RowExternal, RowOrigin, RowOutput
 
 # Внешние данные, путь к папке
 EXTERNAL_PATH = ".\\external\\*.csv"
-# EXTERNAL_PATH = "./external/*.csv"
+EXTERNAL_PATH = "./external/*.csv"
 
 # Наши данные с iiko
 ORIGIN_PATH = ".\\origin.csv"
-# ORIGIN_PATH = "./origin.csv"
+ORIGIN_PATH = "./origin.csv"
 
 # Вывод найденных файлов
 OUTPUT_PATH = ".\\output\\"
-# OUTPUT_PATH = "./output/"
+OUTPUT_PATH = "./output/"
 
 
 
@@ -35,7 +35,9 @@ def _clear_folder(path: str) -> None:
 
 
 def _get_file_name(file_path: str) -> str:
-    return file_path.split("/")[-1]
+    # name = file_path.split("\\")[-1]
+    name = file_path.split("/")[-1]
+    return name
 
 
 def _get_org_names(file_name: str) -> str:
