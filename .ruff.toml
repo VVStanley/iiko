@@ -1,0 +1,21 @@
+# .ruff.toml
+line-length = 120
+
+# Базовые настройки
+select = [
+  "E",  # Pycodestyle Errors
+  "F",  # Pyflakes
+  "W",  # Pycodestyle Warnings
+  "UP",  # pyupgrade (модернизация кода)
+  "I",   # isort (сортировка импортов)
+  "Q",   # flake8-quotes (кавычки)
+]
+
+# Игнорируемые правила
+ignore = [
+  "E203",  # Пробел перед ':' (может конфликтовать с black)
+]
+
+# Настройки isort (сортировка импортов)
+[isort]
+lines-after-imports = 2

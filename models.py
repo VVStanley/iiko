@@ -23,7 +23,7 @@ ORGS: Dict[str, OrgNames] = {
 PHONES: Dict[str, str] = {
     "Djinatec" : 7921,
     "FarmaFond" : 7922,
-    "FS" : 7923,
+    "FS": 7923,
     "Primafarm" : 7924,
     "Profarm" : 7925,
     "PuniaNV" : 7929,
@@ -31,6 +31,14 @@ PHONES: Dict[str, str] = {
     "RiverPark" : 7926,
     "Sivalab" : 7927,
 }
+
+
+class BaseParceError(Exception):
+    pass
+
+
+class GetRowOriginError(BaseParceError):
+    pass
 
 
 def origin_orgs() -> List[str]:
@@ -77,23 +85,23 @@ class RowExternal:
     @classmethod
     def from_row(cls, row: List[Any]) -> "RowExternal":
         return cls(
-            number = row[0],
-            date = row[1],
-            two = row[2],
-            type_ = row[3],
-            code = row[4],
-            fio = row[5],
-            two2 = row[6],
-            amount = row[7],
-            skip1 = row[8],
-            skip2 = row[9],
-            skip3 = row[10],
-            org = row[11],
-            skip5 = row[12],
-            skip6 = row[13],
-            skip7 = row[14],
-            skip8 = row[15],
-            zero = row[16],
+            number=row[0],
+            date=row[1],
+            two=row[2],
+            type_=row[3],
+            code=row[4],
+            fio=row[5],
+            two2=row[6],
+            amount=row[7],
+            skip1=row[8],
+            skip2=row[9],
+            skip3=row[10],
+            org=row[11],
+            skip5=row[12],
+            skip6=row[13],
+            skip7=row[14],
+            skip8=row[15],
+            zero=row[16],
         )
 
 
@@ -106,7 +114,7 @@ class MCard:
     def from_magnet_cards(cls, magnet_cards: str) -> "MCard":
         active = None
         deleted = []
-        if ',' in magnet_cards:
+        if "," in magnet_cards:
             for card in magnet_cards.split(","):
                 card = card.strip()
                 if card.isdigit():
@@ -133,14 +141,6 @@ class RowOrigin:
     category: str
 
     @staticmethod
-    def _get_magnet_number(magnet_cards: str) -> Optional[str]:
-        if ',' in magnet_cards:
-            for card in magnet_cards.split(","):
-                if card.isdigit():
-                    return card
-        return magnet_cards if magnet_cards.isdigit() else None
-    
-    @staticmethod
     def _get_org(guest_categories: str) -> str:
         for cat in guest_categories.split(","):
             if cat.strip() in origin_orgs():
@@ -153,16 +153,31 @@ class RowOrigin:
                 return cat.strip()
 
     @classmethod
-    def from_csv(cls,  row: dict) -> "RowOrigin":
+    def from_csv(cls, row: dict) -> "RowOrigin":
+        try:
+            magnet_card = MCard.from_magnet_cards(row["MagnetCards"])
+        except Exception as e:
+            raise GetRowOriginError(f"\n!!! Не удалось спарсить карту из строки - {row}\n\n Error - {str(e)}")
+
+        try:
+            org = cls._get_org(row["GuestCategories"])
+        except Exception as e:
+            raise GetRowOriginError(f"\n!!! Не удалось спарсить организацию из строки - {row}\n\n Error - {str(e)}")
+
+        try:
+            category = cls._get_category(row["GuestCategories"])
+        except Exception as e:
+            raise GetRowOriginError(f"\n!!! Не удалось спарсить категорию из строки - {row}\n\n Error - {str(e)}")
+
         return cls(
             phone=row["PhoneNumber"],
             fio=row["Name"],
-            magnet_card=MCard.from_magnet_cards(row["MagnetCards"]),
+            magnet_card=magnet_card,
             magnet_cards=row["MagnetCards"],
             when_created=datetime.strptime(row["WhenCreated"], "%d.%m.%Y %H:%M:%S"),
             guest_categories=row["GuestCategories"],
-            org=cls._get_org(row["GuestCategories"]),
-            category=cls._get_category(row["GuestCategories"]),
+            org=org,
+            category=category,
         )
 
 
@@ -175,8 +190,24 @@ class RowOutput:
     amount: str
     org: str
 
+    @classmethod
+    def from_externel(cls, phone: Optional[str], row: RowExternal, is_deleted: bool = False) -> "RowOutput":
+        return cls(
+            phone=phone,
+            track_1=row.number if not is_deleted else f"{row.number}(удалена)",
+            name=row.last_name,
+            last_name=row.first_middle_name,
+            amount=row.amount,
+            org=row.org,
+        )
 
-
-
-
-
+    @classmethod
+    def from_origin(cls, emp: RowOrigin) -> "RowOutput":
+        return cls(
+            phone=emp.phone,
+            track_1=emp.magnet_card.active,
+            name=emp.fio,
+            last_name=emp.fio,
+            amount=emp.category,
+            org=emp.org,
+        )
