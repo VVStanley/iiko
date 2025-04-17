@@ -8,27 +8,27 @@ from typing import Any, Dict, List, Optional
 OrgNames = namedtuple("OrgNames", ["external", "origin"])
 
 ORGS: Dict[str, OrgNames] = {
-    "Djinatec": OrgNames(external="ДЖИНАТЭК ООО", origin="ДЖИНАТЭК ООО"),
-    "FarmaFond": OrgNames(external="ООО \"ФАРМАФОНД\"", origin="ФАРМАФОНД ООО"),
-    "FS": OrgNames(external="Фармасинтез", origin="Фармасинтез ООО"),
-    "Primafarm": OrgNames(external="Примафарм", origin="Примафарм ООО"),
-    "Profarm": OrgNames(external="Профарм", origin="Профарм ООО"),
-    "PuniaNV": OrgNames(external="ИП ПунияНВ", origin="Пуния НВ ИП"),
-    "PuniaVS": OrgNames(external="ИП ПунияВС", origin="Пуния ВС ИП"),
-    "RiverPark": OrgNames(external="РИВЕР ПАРК ООО", origin="РИВЕР ПАРК ООО"),
+    # "Djinatec": OrgNames(external="ДЖИНАТЭК ООО", origin="ДЖИНАТЭК ООО"),
+    # "FarmaFond": OrgNames(external="ООО \"ФАРМАФОНД\"", origin="ФАРМАФОНД ООО"),
+    # "FS": OrgNames(external="Фармасинтез", origin="Фармасинтез ООО"),
+    # "Primafarm": OrgNames(external="Примафарм", origin="Примафарм ООО"),
+    # "Profarm": OrgNames(external="Профарм", origin="Профарм ООО"),
+    # "PuniaNV": OrgNames(external="ИП ПунияНВ", origin="Пуния НВ ИП"),
+    # "PuniaVS": OrgNames(external="ИП ПунияВС", origin="Пуния ВС ИП"),
+    # "RiverPark": OrgNames(external="РИВЕР ПАРК ООО", origin="РИВЕР ПАРК ООО"),
     "Sivalab": OrgNames(external="ООО \"СИВИлаб\"", origin="СИВИлаб ООО"),
 }
 
 
 PHONES: Dict[str, str] = {
-    "Djinatec" : 7921,
-    "FarmaFond" : 7922,
-    "FS": 7923,
-    "Primafarm" : 7924,
-    "Profarm" : 7925,
-    "PuniaNV" : 7929,
-    "PuniaVS" : 7930,
-    "RiverPark" : 7926,
+    # "Djinatec" : 7921,
+    # "FarmaFond" : 7922,
+    # "FS": 7923,
+    # "Primafarm" : 7924,
+    # "Profarm" : 7925,
+    # "PuniaNV" : 7929,
+    # "PuniaVS" : 7930,
+    # "RiverPark" : 7926,
     "Sivalab" : 7927,
 }
 

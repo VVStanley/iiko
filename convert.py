@@ -81,7 +81,7 @@ def next_phone(org_name) -> str:
 def convert() -> None:
     map_active_origin_employees: Dict[str, RowOrigin] = {}
     map_deactive_origin_employees: Dict[str, RowOrigin] = {}
-    deleted_cards = []
+    map_deleted_origin_employess: Dict[str, RowOrigin] = {}
     for emp in _origin_data():
         if emp.magnet_card.active:
             map_active_origin_employees.update({emp.magnet_card.active: emp})
@@ -89,7 +89,11 @@ def convert() -> None:
                 for del_card in emp.magnet_card.deleted:
                     map_deactive_origin_employees.update({del_card: emp})
         else:
-            deleted_cards.append(emp.magnet_card.deleted)
+            if isinstance(emp.magnet_card.deleted, list):
+                for del_card in emp.magnet_card.deleted:
+                    map_deleted_origin_employess.update({del_card: emp})
+            else:
+                map_deleted_origin_employess.update({emp.magnet_card.deleted: emp})
 
     outputs = defaultdict(list)
 
@@ -104,7 +108,7 @@ def convert() -> None:
             for raw_row in reader:
                 row = RowExternal.from_row(raw_row)
                 all_external_emp_card_finds.append(row.number)
-                if row.number not in map_active_origin_employees and row.number not in deleted_cards:
+                if row.number not in map_active_origin_employees and row.number:
                     if row.number in map_deactive_origin_employees:
                         outputs[file_name].append(
                             RowOutput.from_externel(
@@ -113,6 +117,11 @@ def convert() -> None:
                                 is_deleted=True,
                             )
                         )
+                    elif row.number in map_deleted_origin_employess and row.fio != map_deleted_origin_employess[row.number].fio:
+                        outputs[file_name].append(
+                            RowOutput.from_externel(phone=next_phone(_get_org_names(file_name)), row=row)
+                        )
+
                     else:
                         outputs[file_name].append(
                             RowOutput.from_externel(phone=next_phone(_get_org_names(file_name)), row=row)
