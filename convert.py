@@ -185,7 +185,7 @@ def convert() -> None:
 if __name__ == "__main__":
     _clear_folder(OUTPUT_PATH)
 
-    # _copy_external_files()
+    _copy_external_files()
 
     calc_phones()
 
