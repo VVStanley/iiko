@@ -6,3 +6,4 @@ outputs/*
 *.exe
 *.spec
 __pycache__
+venv/*
